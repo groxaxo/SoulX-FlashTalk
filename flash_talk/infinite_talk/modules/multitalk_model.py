@@ -58,7 +58,7 @@ def rope_apply(x, grid_sizes, freqs):
             freqs[2][:w].view(1, 1, w, -1).expand(f, h, w, -1)
         ],
                             dim=-1).reshape(seq_len, 1, -1)
-        freqs_i = freqs_i.to(device=x_i.device)
+
         x_i = torch.view_as_real(x_i * freqs_i).flatten(2)
         x_i = torch.cat([x_i, x[i, seq_len:]])
 
@@ -554,6 +554,11 @@ class WanModel(ModelMixin, ConfigMixin):
             ref_target_masks=None,
         ):
         assert clip_fea is not None and y is not None
+        
+        # params
+        device = self.patch_embedding.weight.device
+        if self.freqs.device != device:
+            self.freqs = self.freqs.to(device)
 
         _, T, H, W = x[0].shape
         N_t = T // self.patch_size[0]
