@@ -39,8 +39,8 @@
 <table>
   <tbody>
     <tr>
-      <td width="50%"><video src="https://private-user-images.githubusercontent.com/176391424/532641864-17cd4ae6-db1c-4f51-a8bb-2b6cccb0e202.mp4?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3Njc3NTQ0NDQsIm5iZiI6MTc2Nzc1NDE0NCwicGF0aCI6Ii8xNzYzOTE0MjQvNTMyNjQxODY0LTE3Y2Q0YWU2LWRiMWMtNGY1MS1hOGJiLTJiNmNjY2IwZTIwMi5tcDQ_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjYwMTA3JTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI2MDEwN1QwMjQ5MDRaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT1jMzQ0NDMxNjQ3ZmFhNjAzMDZkYzBlOWEzOWVkNTM0MDJkYzRmZDBlNDE4YWZmYTY0NzkwY2RhOTVlN2I2ZDM3JlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCJ9.GKmqwpvv46AQIRE89_KouqpC6ZTp3jzqXRIiLTAzxwU" style="width:100%; aspect-ratio:16/9; object-fit:cover;" controls loop></video></td>
-      <td width="50%"><video src="https://private-user-images.githubusercontent.com/176391424/532641924-5e2b9ccb-cc62-4250-ae2e-9b7612bf0a04.mp4?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3Njc3NTQ0NjAsIm5iZiI6MTc2Nzc1NDE2MCwicGF0aCI6Ii8xNzYzOTE0MjQvNTMyNjQxOTI0LTVlMmI5Y2NiLWNjNjItNDI1MC1hZTJlLTliNzYxMmJmMGEwNC5tcDQ_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjYwMTA3JTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI2MDEwN1QwMjQ5MjBaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT1lYWM3YTIzZTM0MTQ3YjdiNTAxMmZkZDNhMjhhNmQ1YjVkNTA4MjQyNzZjY2IxOTY1NmJjZWY4YzgyMjcyZjAyJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCJ9.AD2JmD_E8syZlQPr5tzGsSoe-o_78SFq77MJ5I7qRAA" style="width:100%; aspect-ratio:16/9; object-fit:cover;" controls loop></video></td>
+      <td width="50%"><video src="https://private-user-images.githubusercontent.com/176391424/542681016-8405bc16-836d-4497-aa86-b62e9fc7dbed.mp4?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3Njk3NjAyNDUsIm5iZiI6MTc2OTc1OTk0NSwicGF0aCI6Ii8xNzYzOTE0MjQvNTQyNjgxMDE2LTg0MDViYzE2LTgzNmQtNDQ5Ny1hYTg2LWI2MmU5ZmM3ZGJlZC5tcDQ_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjYwMTMwJTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI2MDEzMFQwNzU5MDVaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT1kODAzMzcyZjQzZDg3N2U1YjJlNDZhOTE4ZTllMGRlOTY4OWZhOWVjOWZjNjc1N2QwNWU5OGQ2ZWVjMzY0YWYxJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCJ9.3oKK0XwqanMJZy6iARStVaPbMRcpQWeTrRlCNQeSXl0" style="width:100%; aspect-ratio:16/9; object-fit:cover;" controls loop></video></td>
+      <td width="50%"><video src="https://private-user-images.githubusercontent.com/176391424/542682295-9e59ad13-7d3a-4bfc-a949-1a00da5d19f4.mp4?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3Njk3NjAyNTksIm5iZiI6MTc2OTc1OTk1OSwicGF0aCI6Ii8xNzYzOTE0MjQvNTQyNjgyMjk1LTllNTlhZDEzLTdkM2EtNGJmYy1hOTQ5LTFhMDBkYTVkMTlmNC5tcDQ_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjYwMTMwJTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI2MDEzMFQwNzU5MTlaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT1jOGNhMDcwZGUyYjdkMzM5YTZmYjFjMTMxZDQ0MTI5YmVmNjEzMWNmMjJmZTkyMjc5NWRmMTQzMGIzNjhjYjAyJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCJ9.9fzD-WHHZPl5lm6W4S-cYU5giKsid0wCQj4qpkGI838" style="width:100%; aspect-ratio:16/9; object-fit:cover;" controls loop></video></td>
     </tr>
   </tbody>
 </table>
@@ -122,22 +122,38 @@ Coming Soon!
 
 
 ## 📧 Contact Us
-If you are interested in leaving a message to our work, feel free to email le.shen@mail.dhu.edu.cn or qiaoqian@soulapp.cn or yutan@soulapp.cn or zhouke@soulapp.cn or liusiyuan@soulapp.cn
+<!-- If you are interested in leaving a message to our work, feel free to email le.shen@mail.dhu.edu.cn or qiaoqian@soulapp.cn or yutan@soulapp.cn or zhouke@soulapp.cn or liusiyuan@soulapp.cn
 
 You’re welcome to join our WeChat group for technical discussions, updates.
 
 Due to Group 1 reaching its capacity, we have opened a new WeChat group for further technical discussions and updates. Feel free to join us!
 <p align="center">
-  <!-- <em>Due to group limits, if you can't scan the QR code, please add my WeChat for group access  -->
-      <!-- : <strong>Tiamo James</strong></em> -->
   <br>
   <span style="display: inline-block; margin-right: 10px;">
     <img src="assets/wechat_group.png" width="300" alt="WeChat Group QR Code"/>
   </span>
-  <!-- <span style="display: inline-block;">
-    <img src="assets/wechat_tiamo.jpg" width="300" alt="WeChat QR Code"/>
-  </span> -->
-</p>
+</p> -->
+If you are interested in leaving a message to our work, feel free to email le.shen@mail.dhu.edu.cn or qiaoqian@soulapp.cn or yutan@soulapp.cn or zhouke@soulapp.cn or liusiyuan@soulapp.cn
+
+Due to Group 1 reaching its capacity, we have opened a new WeChat group. Additionally, we represent **SoulApp** and warmly welcome everyone to download the app and join our Soul group for further technical discussions and updates!
+
+<div align="center">
+  <table>
+    <tr>
+      <td align="center">
+        <img src="assets/wechat_group.png" width="300" alt="WeChat Group QR Code"/>
+        <br />
+        <strong>Join WeChat Group<br>(加入微信技术群)</strong>
+      </td>
+      <td width="100"></td>
+      <td align="center">
+        <img src="assets/soul_group.png" width="300" alt="Soul App Group QR Code"/>
+        <br />
+        <strong>Download SoulApp & Join Group<br>(下载SoulApp加入群组)</strong>
+      </td>
+    </tr>
+  </table>
+</div>
 
  
 ## 📚 Citation
