@@ -71,6 +71,12 @@ def _parse_args():
         "--cpu_offload",
         action="store_true",
         help="Enable CPU offload for low VRAM usage")
+    parser.add_argument(
+        "--quantize",
+        type=str,
+        default=None,
+        choices=["quanto-int4", "quanto-int8", "bitsandbytes-nf4"],
+        help="Quantization mode: quanto-int4, quanto-int8, or bitsandbytes-nf4")
     args = parser.parse_args()
 
     _validate_args(args)
@@ -105,7 +111,7 @@ def generate(args):
     world_size = int(os.environ.get("WORLD_SIZE", 1))
     rank = int(os.environ.get("RANK", 0))
 
-    pipeline = get_pipeline(world_size=world_size, ckpt_dir=args.ckpt_dir, wav2vec_dir=args.wav2vec_dir, cpu_offload=args.cpu_offload)
+    pipeline = get_pipeline(world_size=world_size, ckpt_dir=args.ckpt_dir, wav2vec_dir=args.wav2vec_dir, cpu_offload=args.cpu_offload, quantize_mode=args.quantize)
     get_base_data(pipeline, input_prompt=args.input_prompt, cond_image=args.cond_image, base_seed=args.base_seed)
 
     generated_list = []

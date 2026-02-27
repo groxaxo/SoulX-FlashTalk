@@ -8,6 +8,7 @@ import time
 
 import numpy as np
 import torch
+import torch.nn as nn
 import torch.distributed as dist
 from einops import rearrange
 
@@ -23,6 +24,8 @@ COMPILE_MODEL = True
 COMPILE_VAE = True
 # use parallel vae to speedup decode/encode
 USE_PARALLEL_VAE = True
+# Enable detailed per-step timing (causes GPU stalls via synchronize)
+DEBUG_TIMING = False
 
 def to_param_dtype_fp32only(model, param_dtype):
     for module in model.modules():
@@ -54,6 +57,7 @@ class FlashTalkPipeline:
         device="cuda",
         use_usp=False,
         cpu_offload=False,
+        quantize_mode=None,
         num_timesteps=1000,
         use_timestep_transform=True,
     ):
@@ -111,6 +115,41 @@ class FlashTalkPipeline:
 
         self.model.eval().requires_grad_(False)
 
+        # Apply quantization if requested
+        self.quantize_mode = quantize_mode
+        if quantize_mode == "quanto-int4":
+            try:
+                from optimum.quanto import freeze, qint4, quantize
+                logger.info("Applying quanto INT4 quantization to WanModel...")
+                quantize(self.model, weights=qint4)
+                freeze(self.model)
+                logger.info("quanto INT4 quantization applied successfully.")
+            except Exception as e:
+                logger.warning(f"quanto INT4 quantization failed: {e}. Running without quantization.")
+                self.quantize_mode = None
+        elif quantize_mode == "quanto-int8":
+            try:
+                from optimum.quanto import freeze, qint8, quantize
+                logger.info("Applying quanto INT8 quantization to WanModel...")
+                quantize(self.model, weights=qint8)
+                freeze(self.model)
+                logger.info("quanto INT8 quantization applied successfully.")
+            except Exception as e:
+                logger.warning(f"quanto INT8 quantization failed: {e}. Running without quantization.")
+                self.quantize_mode = None
+        elif quantize_mode == "bitsandbytes-nf4":
+            try:
+                import bitsandbytes as bnb
+                logger.info("Applying bitsandbytes NF4 quantization to WanModel...")
+                self.model = self._quantize_bnb_nf4(self.model)
+                logger.info("bitsandbytes NF4 quantization applied successfully.")
+            except Exception as e:
+                logger.warning(f"bitsandbytes NF4 quantization failed: {e}. Running without quantization.")
+                self.quantize_mode = None
+        elif quantize_mode is not None:
+            logger.warning(f"Unknown quantize_mode '{quantize_mode}'. Running without quantization.")
+            self.quantize_mode = None
+
         if use_usp:
             from xfuser.core.distributed import get_sequence_parallel_world_size
 
@@ -136,7 +175,7 @@ class FlashTalkPipeline:
         self.num_timesteps = num_timesteps
         self.use_timestep_transform = use_timestep_transform
 
-        if COMPILE_MODEL and not self.cpu_offload:
+        if COMPILE_MODEL and not self.cpu_offload and self.quantize_mode is None:
             self.model = torch.compile(self.model)
         if COMPILE_VAE and not self.cpu_offload:
             self.vae.encode = torch.compile(self.vae.encode)
@@ -145,6 +184,34 @@ class FlashTalkPipeline:
         self.audio_encoder = Wav2Vec2Model.from_pretrained(wav2vec_dir, local_files_only=True).to(self.device)
         self.audio_encoder.feature_extractor._freeze_parameters()
         self.wav2vec_feature_extractor = Wav2Vec2FeatureExtractor.from_pretrained(wav2vec_dir, local_files_only=True)
+
+    @staticmethod
+    def _quantize_bnb_nf4(model):
+        """Replace Linear layers with bitsandbytes NF4 quantized layers."""
+        import bitsandbytes as bnb
+        for name, module in model.named_modules():
+            if isinstance(module, nn.Linear) and module.weight.numel() > 1024:
+                parent_name = ".".join(name.split(".")[:-1])
+                child_name = name.split(".")[-1]
+                parent = model
+                if parent_name:
+                    for part in parent_name.split("."):
+                        parent = getattr(parent, part)
+                old = getattr(parent, child_name)
+                new_layer = bnb.nn.Linear4bit(
+                    old.in_features, old.out_features,
+                    bias=old.bias is not None,
+                    compute_dtype=old.weight.dtype,
+                    quant_type="nf4",
+                )
+                new_layer.weight = bnb.nn.Params4bit(
+                    old.weight.data, requires_grad=False,
+                    quant_type="nf4", compress_statistics=True,
+                )
+                if old.bias is not None:
+                    new_layer.bias = old.bias
+                setattr(parent, child_name, new_layer)
+        return model
 
     @torch.no_grad()
     def prepare_params(self,
@@ -297,17 +364,19 @@ class FlashTalkPipeline:
                 timestep = self.timesteps[i]
                 latent_model_input = [latent]
 
-                torch.cuda.synchronize()
-                start_time = time.time()
+                if DEBUG_TIMING:
+                    torch.cuda.synchronize()
+                    start_time = time.time()
 
                 # inference without CFG
                 noise_pred_cond = self.model(
                     latent_model_input, t=timestep, **self.arg_c)[0]
 
-                torch.cuda.synchronize()
-                end_time = time.time()
-                if self.rank == 0:
-                    print(f'[generate] model denoise per step: {end_time - start_time}s')
+                if DEBUG_TIMING:
+                    torch.cuda.synchronize()
+                    end_time = time.time()
+                    if self.rank == 0:
+                        print(f'[generate] model denoise per step: {end_time - start_time}s')
 
                 noise_pred = -noise_pred_cond
 
@@ -325,32 +394,38 @@ class FlashTalkPipeline:
                 torch.cuda.empty_cache()
                 self.vae.model.to(self.device)
 
-            torch.cuda.synchronize()
-            start_decode_time = time.time()
+            if DEBUG_TIMING:
+                torch.cuda.synchronize()
+                start_decode_time = time.time()
             videos = self.vae.decode(latent.to(self.param_dtype))
-            torch.cuda.synchronize()
-            end_decode_time = time.time()
-            if self.rank == 0:
-                print(f'[generate] decode video frames: {end_decode_time - start_decode_time}s')
+            if DEBUG_TIMING:
+                torch.cuda.synchronize()
+                end_decode_time = time.time()
+                if self.rank == 0:
+                    print(f'[generate] decode video frames: {end_decode_time - start_decode_time}s')
         
-        torch.cuda.synchronize()
-        start_color_correction_time = time.time()
+        if DEBUG_TIMING:
+            torch.cuda.synchronize()
+            start_color_correction_time = time.time()
         if self.color_correction_strength > 0.0:
             videos = match_and_blend_colors_torch(videos, self.original_color_reference, self.color_correction_strength)
 
         cond_frame = videos[:, :, -self.motion_frames_num:].to(self.device)
-        torch.cuda.synchronize()
-        end_color_correction_time = time.time()
-        if self.rank == 0:
-            print(f'[generate] color correction: {end_color_correction_time - start_color_correction_time}s')
+        if DEBUG_TIMING:
+            torch.cuda.synchronize()
+            end_color_correction_time = time.time()
+            if self.rank == 0:
+                print(f'[generate] color correction: {end_color_correction_time - start_color_correction_time}s')
 
-        torch.cuda.synchronize()
-        start_encode_time = time.time()
+        if DEBUG_TIMING:
+            torch.cuda.synchronize()
+            start_encode_time = time.time()
         self.latent_motion_frames = self.vae.encode(cond_frame)
-        torch.cuda.synchronize()
-        end_encode_time = time.time()
-        if self.rank == 0:
-            print(f'[generate] encode motion frames: {end_encode_time - start_encode_time}s')
+        if DEBUG_TIMING:
+            torch.cuda.synchronize()
+            end_encode_time = time.time()
+            if self.rank == 0:
+                print(f'[generate] encode motion frames: {end_encode_time - start_encode_time}s')
 
         if self.cpu_offload:
             self.vae.model.cpu()

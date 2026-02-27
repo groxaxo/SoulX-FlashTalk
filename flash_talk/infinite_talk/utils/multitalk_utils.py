@@ -98,7 +98,6 @@ def calculate_x_ref_attn_map(visual_q, ref_k, ref_target_masks, mode='mean', att
     x_ref_attn_map_source = x_ref_attn_map_source.to(visual_q.dtype)
 
     for class_idx, ref_target_mask in enumerate(ref_target_masks):
-        torch_gc()
         ref_target_mask = ref_target_mask[None, None, None, ...]  # 1 1 1 hw
         x_ref_attnmap = x_ref_attn_map_source * ref_target_mask
         x_ref_attnmap = x_ref_attnmap.sum(-1) / ref_target_mask.sum() # B, H, x_seqlens, ref_seqlens --> B, H, x_seqlens
@@ -113,7 +112,6 @@ def calculate_x_ref_attn_map(visual_q, ref_k, ref_target_masks, mode='mean', att
     
     del attn
     del x_ref_attn_map_source
-    torch_gc()
 
     return torch.concat(x_ref_attn_maps, dim=0)
 
@@ -676,8 +674,12 @@ def resize_and_centercrop(cond_image, target_size):
 
     return cropped_tensor
 
+_loudness_meters = {}
+
 def loudness_norm(audio_array, sr=16000, lufs=-23):
-    meter = pyln.Meter(sr)
+    if sr not in _loudness_meters:
+        _loudness_meters[sr] = pyln.Meter(sr)
+    meter = _loudness_meters[sr]
     loudness = meter.integrated_loudness(audio_array)
     if abs(loudness) > 100:
         return audio_array
