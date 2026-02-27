@@ -15,7 +15,7 @@ with open("flash_talk/configs/infer_params.yaml", "r") as f:
 # TODO: support more resolution
 target_size = (infer_params['height'], infer_params['width'])
 
-def get_pipeline(world_size, ckpt_dir, wav2vec_dir, cpu_offload=False):
+def get_pipeline(world_size, ckpt_dir, wav2vec_dir, cpu_offload=False, quantize_mode=None):
     cfg = multitalk_14B
 
     ulysses_degree, ring_degree = get_parallel_degree(world_size, cfg.num_heads)
@@ -29,6 +29,7 @@ def get_pipeline(world_size, ckpt_dir, wav2vec_dir, cpu_offload=False):
         device=device,
         use_usp=(world_size > 1),
         cpu_offload=cpu_offload,
+        quantize_mode=quantize_mode,
     )
 
     return pipeline

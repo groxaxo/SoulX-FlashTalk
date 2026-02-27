@@ -18,6 +18,7 @@ from flash_talk.inference import get_pipeline, get_base_data, get_audio_embeddin
 pipeline = None
 loaded_ckpt_dir = None
 loaded_wav2vec_dir = None
+loaded_quantize_mode = None
 
 def run_multi_gpu_inference(
     gpu_ids,
@@ -151,18 +152,22 @@ def run_inference(
     audio_encode_mode,
     seed,
     cpu_offload,
+    quantize_mode="None",
     progress=gr.Progress()
 ):
-    global pipeline, loaded_ckpt_dir, loaded_wav2vec_dir
+    global pipeline, loaded_ckpt_dir, loaded_wav2vec_dir, loaded_quantize_mode
+
+    qm = quantize_mode if quantize_mode != "None" else None
 
     # 1. Load Model if needed
-    if pipeline is None or loaded_ckpt_dir != ckpt_dir or loaded_wav2vec_dir != wav2vec_dir:
+    if pipeline is None or loaded_ckpt_dir != ckpt_dir or loaded_wav2vec_dir != wav2vec_dir or loaded_quantize_mode != qm:
         progress(0, desc="Loading Model...")
         logger.info(f"Loading pipeline with ckpt_dir={ckpt_dir}, wav2vec_dir={wav2vec_dir}")
         try:
-            pipeline = get_pipeline(world_size=1, ckpt_dir=ckpt_dir, wav2vec_dir=wav2vec_dir, cpu_offload=cpu_offload)
+            pipeline = get_pipeline(world_size=1, ckpt_dir=ckpt_dir, wav2vec_dir=wav2vec_dir, cpu_offload=cpu_offload, quantize_mode=qm)
             loaded_ckpt_dir = ckpt_dir
             loaded_wav2vec_dir = wav2vec_dir
+            loaded_quantize_mode = qm
         except Exception as e:
             logger.error(f"Failed to load model: {e}")
             raise gr.Error(f"Failed to load model: {e}")
@@ -343,6 +348,12 @@ with gr.Blocks(title="SoulX-FlashTalk Video Generator", theme=gr.themes.Soft()) 
                             value=9999, 
                             precision=0
                         )
+                        quantize_input = gr.Dropdown(
+                            label="Quantization Mode",
+                            choices=["None", "quanto-int4", "quanto-int8", "bitsandbytes-nf4"],
+                            value="None",
+                            info="Quantize model to reduce VRAM usage. Recommended: quanto-int4 for RTX 3090."
+                        )
 
         with gr.Column(scale=1):
             gr.Markdown("### 📺 Output Video")
@@ -358,10 +369,10 @@ with gr.Blocks(title="SoulX-FlashTalk Video Generator", theme=gr.themes.Soft()) 
     mode_input.change(fn=update_visibility, inputs=mode_input, outputs=[gpu_ids_input, cpu_offload_input])
 
     def dispatch_inference(
-        mode, gpu_ids, ckpt, wav2vec, prompt, img, audio, enc_mode, seed, cpu_off
+        mode, gpu_ids, ckpt, wav2vec, prompt, img, audio, enc_mode, seed, cpu_off, quant_mode
     ):
         if mode == "Single GPU (Interactive)":
-            return run_inference(ckpt, wav2vec, prompt, img, audio, enc_mode, seed, cpu_off)
+            return run_inference(ckpt, wav2vec, prompt, img, audio, enc_mode, seed, cpu_off, quant_mode)
         else:
             return run_multi_gpu_inference(gpu_ids, ckpt, wav2vec, prompt, img, audio, enc_mode, seed)
 
@@ -378,7 +389,8 @@ with gr.Blocks(title="SoulX-FlashTalk Video Generator", theme=gr.themes.Soft()) 
             audio_path_input,
             audio_encode_mode_input,
             seed_input,
-            cpu_offload_input
+            cpu_offload_input,
+            quantize_input
         ],
         outputs=video_output
     ) 
