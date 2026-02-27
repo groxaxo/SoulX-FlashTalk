@@ -201,7 +201,7 @@ class FlashTalkPipeline:
                 new_layer = bnb.nn.Linear4bit(
                     old.in_features, old.out_features,
                     bias=old.bias is not None,
-                    compute_dtype=torch.bfloat16,
+                    compute_dtype=old.weight.dtype,
                     quant_type="nf4",
                 )
                 new_layer.weight = bnb.nn.Params4bit(
